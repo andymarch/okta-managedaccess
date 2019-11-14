@@ -28,7 +28,7 @@ module.exports = function (){
             var parentEntity = await axios.get(process.env.TENANT+'api/v1/users/'+req.body.data.context.session.userId + 
             "/linkedObjects/parentEntity")
             if(parentEntity.data.length > 0){
-                var response = await axios.get(ownerObj_response.data[0]._links.self.href);
+                var response = await axios.get(parentEntity.data[0]._links.self.href);
                 var accessCommand = {
                     'type': 'com.okta.access.patch',
                     'value': [
