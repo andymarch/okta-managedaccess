@@ -25,7 +25,7 @@ module.exports = function (){
             if(parentAgency.data.length > 0){
                 var response = await axios.get(parentAgency.data[0]._links.self.href);
                 console.log(response.data)
-                var agencyIdCommand = {
+                /*var agencyIdCommand = {
                     'type': 'com.okta.access.patch',
                     'value': [
                         {
@@ -36,7 +36,7 @@ module.exports = function (){
                     ]
                 }
                 structure[commands].push(agencyIdCommand)
-                console.log("Patched agencyid")
+                console.log("Patched agencyid")*/
 
                 var resp = await axios.get(
                     process.env.TENANT + 'api/v1/users/?search='
