@@ -53,7 +53,7 @@ module.exports = function (){
                 if(resp.data.length == 1) {
 
                     var match = false;
-                    resp.data.profile.delegatedAgents.array.forEach(element => {
+                    resp.data[0].profile.delegatedAgents.array.forEach(element => {
                         console.log(element)
                         if(element === response.data.profile.agencyid){
                             match = true
