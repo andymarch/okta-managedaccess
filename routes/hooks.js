@@ -36,8 +36,7 @@ module.exports = function (){
                     ]
                 }
                 structure[commands].push(agencyIdCommand)
-
-                console.log()
+                console.log("Patched agencyid")
 
                 var resp = await axios.get(
                     process.env.TENANT + 'api/v1/users/?search='
@@ -57,6 +56,7 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(entityIdCommand)
+                    console.log("Patched entityid")
                 }
             }
             res.status(200).json(structure)
