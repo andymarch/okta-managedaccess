@@ -13,13 +13,13 @@ module.exports = function (){
                 process.env.TENANT+'api/v1/users/'
                 +req.body.data.context.session.userId)
 
-            var parentEntity = await axios.get(
+            var parentAgency = await axios.get(
                 process.env.TENANT+'api/v1/users/'
                 +req.body.data.context.session.userId + 
-                "/linkedObjects/parentEntity")
+                "/linkedObjects/parentAgency")
 
-            if(parentEntity.data.length > 0){
-                var response = await axios.get(parentEntity.data[0]._links.self.href);
+            if(parentAgency.data.length > 0){
+                var response = await axios.get(parentAgency.data[0]._links.self.href);
                 var agencyIdCommand = {
                     'type': 'com.okta.access.patch',
                     'value': [
