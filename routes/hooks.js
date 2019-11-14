@@ -39,10 +39,9 @@ module.exports = function (){
 
                 var resp = await axios.get(
                     process.env.TENANT + 'api/v1/users/?search='
-                    +encodeURIComponent
+                    + encodeURIComponent
                     ('profile.entityId eq "' + agent.data.profile.actingOnBehalfOf +'"' ))
                 console.log(resp.data)
-                res.send()
             }
             res.status(200).json(structure)
         } catch(error){
