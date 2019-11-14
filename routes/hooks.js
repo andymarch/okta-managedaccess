@@ -37,11 +37,27 @@ module.exports = function (){
                 }
                 structure[commands].push(agencyIdCommand)
 
+                console.log()
+
                 var resp = await axios.get(
                     process.env.TENANT + 'api/v1/users/?search='
                     + encodeURIComponent
                     ('profile.entityId eq "' + agent.data.profile.actingOnBehalfOf +'"' ))
                 console.log(resp.data)
+
+                if(resp.data.length == 1) {
+                    var entityIdCommand = {
+                        'type': 'com.okta.access.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/entityid',
+                                'value': resp.data[0].profile.entityId
+                            }
+                        ]
+                    }
+                    structure[commands].push(entityIdCommand)
+                }
             }
             res.status(200).json(structure)
         } catch(error){
