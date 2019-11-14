@@ -38,7 +38,7 @@ module.exports = function (){
                     'value': [
                         {
                             'op': 'add',
-                            'path': '/claims/entity',
+                            'path': '/claims/agency',
                             'value': response.data.profile.agencyName
                         }
                     ]
