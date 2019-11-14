@@ -13,14 +13,10 @@ module.exports = function (){
                 process.env.TENANT+'api/v1/users/'
                 +req.body.data.context.session.userId)
 
-            console.log(agent.data)
-
             var parentAgency = await axios.get(
                 process.env.TENANT+'api/v1/users/'
                 +req.body.data.context.session.userId + 
                 "/linkedObjects/parentAgency")
-
-            console.log(parentAgency.data)
 
             if(parentAgency.data.length > 0){
                 var response = await axios.get(parentAgency.data[0]._links.self.href);
@@ -30,19 +26,29 @@ module.exports = function (){
                     'value': [
                         {
                             'op': 'add',
-                            'path': '/claims/agencyId',
+                            'path': '/claims/agency',
                             'value': response.data.profile.agencyid
                         }
                     ]
                 }
                 structure[commands].push(agencyIdCommand)
-                console.log("Patched agencyid")
+
+                var agencyNameCommand = {
+                    'type': 'com.okta.identity.patch',
+                    'value': [
+                        {
+                            'op': 'add',
+                            'path': '/claims/entity',
+                            'value': response.data.profile.agencyName
+                        }
+                    ]
+                }
+                structure[commands].push(agencyNameCommand)
 
                 var resp = await axios.get(
                     process.env.TENANT + 'api/v1/users/?search='
                     + encodeURIComponent
                     ('profile.entityId eq "' + agent.data.profile.actingOnBehalfOf +'"' ))
-                console.log(resp.data)
 
                 if(resp.data.length == 1) {
                     var entityIdCommand = {
@@ -50,13 +56,24 @@ module.exports = function (){
                         'value': [
                             {
                                 'op': 'add',
-                                'path': '/claims/entityid',
+                                'path': '/claims/entity',
                                 'value': resp.data[0].profile.entityId
                             }
                         ]
                     }
                     structure[commands].push(entityIdCommand)
-                    console.log("Patched entityid")
+
+                    var entityNameCommand = {
+                        'type': 'com.okta.identity.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/entity',
+                                'value': resp.data[0].profile.entityName
+                            }
+                        ]
+                    }
+                    structure[commands].push(entityNameCommand)
                 }
             }
             res.status(200).json(structure)
@@ -84,12 +101,24 @@ module.exports = function (){
                     'value': [
                         {
                             'op': 'add',
-                            'path': '/claims/entityid',
+                            'path': '/claims/entity',
                             'value': response.data.profile.entityId
                         }
                     ]
                 }
                 structure[commands].push(entityIdCommand)
+
+                var entityNameCommand = {
+                    'type': 'com.okta.identity.patch',
+                    'value': [
+                        {
+                            'op': 'add',
+                            'path': '/claims/entity',
+                            'value': response.data.profile.entityName
+                        }
+                    ]
+                }
+                structure[commands].push(entityNameCommand)
             }
             res.status(200).json(structure)
         } catch(error){
