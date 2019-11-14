@@ -51,6 +51,17 @@ module.exports = function (){
                     ('profile.entityId eq "' + agent.data.profile.actingOnBehalfOf +'"' ))
 
                 if(resp.data.length == 1) {
+
+                    var match = false;
+                    resp.data.profile.delegatedAgents.array.forEach(element => {
+                        console.log(element)
+                        if(element === response.data.profile.agencyid){
+                            match = true
+                            break
+                        }
+                    });              
+                    
+                    if(match){
                     var entityIdCommand = {
                         'type': 'com.okta.access.patch',
                         'value': [
@@ -74,6 +85,7 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(entityNameCommand)
+                    }
                 }
             }
             res.status(200).json(structure)
