@@ -30,4 +30,7 @@ module.exports = function (){
             res.status(500).send("An error occurred")
         }
     })
+
+
+return router
 }
