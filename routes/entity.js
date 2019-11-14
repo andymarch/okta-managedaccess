@@ -22,7 +22,6 @@ router.get("/agents", async function(req,res) {
 router.post("/agents", async function(req,res) {
     try{
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.id)
-        console.log(resp.data)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
             var agentQuery = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.agentid)
             if(agentQuery.data.type.id == process.env.AGENCY_TYPE_ID){
@@ -41,7 +40,7 @@ router.post("/agents", async function(req,res) {
             }
         }
         else {
-
+            res.status(200).json({error: "Not an entity"})
         }
     } catch(error){
         console.log(error)
@@ -79,7 +78,7 @@ router.delete("/agents", async function(req,res) {
             }
         }
         else {
-
+            res.status(200).json({error: "Not an entity"})
         }
     } catch(error){
         console.log(error)
