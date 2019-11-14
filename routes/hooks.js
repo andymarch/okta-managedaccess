@@ -4,13 +4,41 @@ const axios = require('axios')
 
 module.exports = function (){
     router.post("/agent", async function(req,res) {
-        let responsePayload = {}
         try{
-            console.log(req.body.data)
-            console.log(req.body.data.context.user.profile)
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
+
+            var agent =  await axios.get(
+                process.env.TENANT+'api/v1/users/'
+                +req.body.data.context.session.userId)
+
+            var parentEntity = await axios.get(
+                process.env.TENANT+'api/v1/users/'
+                +req.body.data.context.session.userId + 
+                "/linkedObjects/parentEntity")
+
+            if(parentEntity.data.length > 0){
+                var response = await axios.get(parentEntity.data[0]._links.self.href);
+                var agencyIdCommand = {
+                    'type': 'com.okta.access.patch',
+                    'value': [
+                        {
+                            'op': 'add',
+                            'path': '/claims/agencyId',
+                            'value': response.data.profile.entityId
+                        }
+                    ]
+                }
+                structure[commands].push(agencyIdCommand)
+
+                var resp = await axios.get(
+                    process.env.TENANT + 'api/v1/users/?search='
+                    +encodeURIComponent
+                    ('profile.entityId eq "' + agent.data.profile.actingOnBehalfOf +'"' ))
+                console.log(resp.data)
+                res.send()
+            }
             res.status(200).json(structure)
         } catch(error){
             console.log(error)
@@ -19,17 +47,19 @@ module.exports = function (){
     })
 
     router.post("/entity", async function(req,res) {
-        let responsePayload = {}
         try{
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
 
-            var parentEntity = await axios.get(process.env.TENANT+'api/v1/users/'+req.body.data.context.session.userId + 
-            "/linkedObjects/parentEntity")
+            var parentEntity = await axios.get(
+                process.env.TENANT+'api/v1/users/'
+                +req.body.data.context.session.userId + 
+                "/linkedObjects/parentEntity")
+
             if(parentEntity.data.length > 0){
                 var response = await axios.get(parentEntity.data[0]._links.self.href);
-                var accessCommand = {
+                var entityIdCommand = {
                     'type': 'com.okta.access.patch',
                     'value': [
                         {
@@ -39,8 +69,8 @@ module.exports = function (){
                         }
                     ]
                 }
+                structure[commands].push(entityIdCommand)
             }
-            structure[commands].push(accessCommand)
             res.status(200).json(structure)
         } catch(error){
             console.log(error)
