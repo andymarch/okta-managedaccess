@@ -31,7 +31,7 @@ module.exports = function (){
                         {
                             'op': 'add',
                             'path': '/claims/agencyId',
-                            'value': response.data.profile.entityId
+                            'value': response.data.profile.agencyid
                         }
                     ]
                 }
