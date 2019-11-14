@@ -7,6 +7,7 @@ module.exports = function (){
         let responsePayload = {}
         try{
             console.log(req.body.data)
+            console.log(req.body.data.user.profile)
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
