@@ -57,7 +57,6 @@ module.exports = function (){
                         console.log(element)
                         if(element === response.data.profile.agencyid){
                             match = true
-                            break
                         }
                     });              
                     
