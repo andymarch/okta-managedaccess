@@ -10,9 +10,11 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 axios.defaults.headers.common['Authorization'] = `SSWS `+process.env.TOKEN
 
-var preAuthRouter = require('./routes/entity')()
+var agentRouter = require('./routes/agent')()
+var entityRouter = require('./routes/entity')()
 var hooksRouter = require('./routes/hooks')()
-app.use('/entity', preAuthRouter)
+app.use('/entity', entityRouter)
+app.use('/agent', agentRouter)
 app.use('/tokenEnrichment', hooksRouter)
 
 const PORT = process.env.PORT || 3000;
