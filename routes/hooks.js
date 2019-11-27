@@ -9,9 +9,15 @@ module.exports = function (){
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
-            console.log(JSON.stringify(req.body))
-            var sessionId = req.body.data.context.session.id
-            var entityId = cache.get(sessionId)
+            
+            //determine if this is a refresh
+            var entityId
+            if(req.body.data.context.session){
+                cache.get(req.body.data.context.session.id)
+            }
+            else{
+                cache.get(req.body.data.context.protcol.originalGrant.refresh_token.jti)
+            }
 
             if(entityId){
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
