@@ -12,15 +12,8 @@ module.exports = function (){
             
             console.log(req.body.data.context)
             //determine if this is a refresh
-            var entityId
-            if(req.body.data.context.session){
-                console.log("using session "+req.body.data.context.session.id)
-                cache.get(req.body.data.context.session.id)
-            }
-            else{
-                console.log("using refresh JTI "+req.body.data.context.protcol.originalGrant.refresh_token.jti)
-                cache.get(req.body.data.context.protcol.originalGrant.refresh_token.jti)
-            }
+            console.log("Looking up "+req.body.data.context.protcol.request.state)
+            var entityId = cache.get(req.body.data.context.protcol.request.state)
 
             if(entityId){
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
