@@ -9,6 +9,7 @@ module.exports = function (){
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
+            console.log(req.body.data)
             var sessionId = req.body.data.context.session.id
             var entityId = cache.get(sessionId)
 
