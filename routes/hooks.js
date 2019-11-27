@@ -16,42 +16,40 @@ module.exports = function (){
             var entityId = cache.get(req.body.data.context.protocol.request.state)
 
             if(entityId){
+                console.log("found cache hit")
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
-                
-                if(resp.data.length == 1) {
-                    //check the user is still delegated by the entity
-                    var match = false;
-                    resp.data.profile.delegatedAgents.forEach(element => {
-                        if(element === response.data.profile.agencyid){
-                            match = true
-                        }
-                    });              
-                    
-                    if(match){
-                        var entityIdCommand = {
-                            'type': 'com.okta.access.patch',
-                            'value': [
-                                {
-                                    'op': 'add',
-                                    'path': '/claims/entity',
-                                    'value': resp.data.profile.entityId
-                                }
-                            ]
-                        }
-                        structure[commands].push(entityIdCommand)
-
-                        var entityNameCommand = {
-                            'type': 'com.okta.identity.patch',
-                            'value': [
-                                {
-                                    'op': 'add',
-                                    'path': '/claims/entity',
-                                    'value': resp.data.profile.entityName
-                                }
-                            ]
-                        }
-                        structure[commands].push(entityNameCommand)
+                //check the user is still delegated by the entity
+                var match = false;
+                resp.data.profile.delegatedAgents.forEach(element => {
+                    if(element === response.data.profile.agencyid){
+                        match = true
                     }
+                });              
+                
+                if(match){
+                    var entityIdCommand = {
+                        'type': 'com.okta.access.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/entity',
+                                'value': resp.data.profile.entityId
+                            }
+                        ]
+                    }
+                    structure[commands].push(entityIdCommand)
+
+                    var entityNameCommand = {
+                        'type': 'com.okta.identity.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/entity',
+                                'value': resp.data.profile.entityName
+                            }
+                        ]
+                    }
+                    structure[commands].push(entityNameCommand)
                 }
             }
             res.status(200).json(structure)
