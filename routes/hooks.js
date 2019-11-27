@@ -10,12 +10,15 @@ module.exports = function (){
             var commands = 'commands'
             structure[commands] = []
             
+            console.log(req.body.data.context)
             //determine if this is a refresh
             var entityId
             if(req.body.data.context.session){
+                console.log("using session "+req.body.data.context.session.id)
                 cache.get(req.body.data.context.session.id)
             }
             else{
+                console.log("using refresh JTI "+req.body.data.context.protcol.originalGrant.refresh_token.jti)
                 cache.get(req.body.data.context.protcol.originalGrant.refresh_token.jti)
             }
 
