@@ -23,21 +23,15 @@ router.post("/agents", async function(req,res) {
     try{
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.id)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
-            var agentQuery = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.agentid)
-            if(agentQuery.data.type.id == process.env.AGENCY_TYPE_ID){
-                var agents = resp.data.profile.delegatedAgents
-                agents.push(req.query.agentid)
-                var payload = {
-                    profile: {
-                        delegatedAgents: agents
-                    }
+            var agents = resp.data.profile.delegatedAgents
+            agents.push(req.query.agentid)
+            var payload = {
+                profile: {
+                    delegatedAgents: agents
                 }
-                await axios.post(process.env.TENANT+'api/v1/users/'+req.query.id,payload)
-                res.status(200).send();
             }
-            else{
-                res.status(200).json({error: "Not an agency"})
-            }
+            await axios.post(process.env.TENANT+'api/v1/users/'+req.query.id,payload)
+            res.status(200).send();
         }
         else {
             res.status(200).json({error: "Not an entity"})
