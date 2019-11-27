@@ -21,7 +21,7 @@ module.exports = function (){
                 //check the user is still delegated by the entity
                 var match = false;
                 resp.data.profile.delegatedAgents.forEach(element => {
-                    if(element === response.data.profile.agencyid){
+                    if(element === req.body.data.context.user.id){
                         match = true
                     }
                 });              
