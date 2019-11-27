@@ -12,8 +12,8 @@ module.exports = function (){
             
             console.log(req.body.data.context)
             //determine if this is a refresh
-            console.log("Looking up "+req.body.data.context.protcol.request.state)
-            var entityId = cache.get(req.body.data.context.protcol.request.state)
+            console.log("Looking up "+req.body.data.context.protocol.request.state)
+            var entityId = cache.get(req.body.data.context.protocol.request.state)
 
             if(entityId){
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
