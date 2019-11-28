@@ -34,7 +34,7 @@ module.exports = function (){
                         'value': [
                             {
                                 'op': 'add',
-                                'path': '/claims/entity',
+                                'path': '/claims/entityId',
                                 'value': resp.data.profile.entityId
                             }
                         ]
@@ -47,7 +47,7 @@ module.exports = function (){
                         'value': [
                             {
                                 'op': 'add',
-                                'path': '/claims/entity',
+                                'path': '/claims/entityName',
                                 'value': resp.data.profile.entityName
                             }
                         ]
