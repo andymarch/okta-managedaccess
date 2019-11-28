@@ -20,6 +20,7 @@ module.exports = function (){
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
                 //check the user is still delegated by the entity
                 var match = false;
+                console.log("Agents: "+resp.data.profile.delegatedAgents)
                 resp.data.profile.delegatedAgents.forEach(element => {
                     if(element === req.body.data.context.user.id){
                         match = true
@@ -27,6 +28,7 @@ module.exports = function (){
                 });              
                 
                 if(match){
+                    console.log("found match")
                     var entityIdCommand = {
                         'type': 'com.okta.access.patch',
                         'value': [
@@ -38,6 +40,7 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(entityIdCommand)
+                    console.log("patched id")
 
                     var entityNameCommand = {
                         'type': 'com.okta.identity.patch',
@@ -50,6 +53,7 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(entityNameCommand)
+                    console.log("patch access")
                 }
             }
             res.status(200).json(structure)
