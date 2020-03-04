@@ -46,6 +46,18 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(entityNameCommand)
+
+                    var loaCommand = {
+                        'type': 'com.okta.identity.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/LOA',
+                                'value': resp.data.profile.LOA
+                            }
+                        ]
+                    }
+                    structure[commands].push(loaCommand)
                 }
             }
             res.status(200).json(structure)
