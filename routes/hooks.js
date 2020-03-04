@@ -48,7 +48,7 @@ module.exports = function (){
                     structure[commands].push(entityNameCommand)
 
                     var loaCommand = {
-                        'type': 'com.okta.identity.patch',
+                        'type': 'com.okta.access.patch',
                         'value': [
                             {
                                 'op': 'add',
