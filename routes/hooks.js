@@ -5,6 +5,7 @@ var cache = require('memory-cache');
 
 module.exports = function (){
     router.post("/agent", async function(req,res) {
+        console.log(req.body.data)
         try{
             var structure = {}
             var commands = 'commands'
