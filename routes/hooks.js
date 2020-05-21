@@ -13,6 +13,7 @@ module.exports = function (){
             var entityId = cache.get(req.body.data.context.protocol.request.state)
 
             if(entityId){
+                console.log("Delegating authority for user")
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
                 //check the user is still delegated by the entity
                 var match = false;
