@@ -1,17 +1,24 @@
 const express = require('express')
 const router = express.Router()
 const axios = require('axios')
+const AgentModel = require('../models/agentmodel')
 
 module.exports = function (){
 
+//List the agents of the user
 router.get("/agents", async function(req,res) {
     try{
-        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.id)
+        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
-            res.status(200).json({agents: resp.data.profile.delegatedAgents})
+            var agents = []
+            for(var entry in resp.data.profile.delegatedAgents){
+                var agent = await axios.get(process.env.TENANT + 'api/v1/users/'+resp.data.profile.delegatedAgents[entry])
+                agents.push(new AgentModel(agent.data))
+                }
+            res.status(200).json({agents: agents})
         }
         else {
-            res.status(200).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an entity"})
         }
     } catch(error){
         console.log(error)
@@ -19,22 +26,38 @@ router.get("/agents", async function(req,res) {
     }
 })
 
+//Add a user to the list of delegated agents
 router.post("/agents", async function(req,res) {
     try{
-        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.id)
-        if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
+        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
+        if(resp.data.type.id == process.env.ENTITY_TYPE_ID){ 
+            var agentid;
+            try{
+                //agentid could be either the id of the user or their login
+                //a user login can contain nonURL safe characters so encode that
+                var resp = await axios.get(process.env.TENANT+'api/v1/users/'+encodeURI(req.query.agentid))
+                agentid = resp.data.id
+            } catch (error){
+                //could not find that user
+                res.status(404).send("user " + req.body.agentid + " not found")
+                return
+            }
+
             var agents = resp.data.profile.delegatedAgents
-            agents.push(req.query.agentid)
+            if (agents == null){
+                agents = []
+            }
+            agents.push(agentid)
             var payload = {
                 profile: {
                     delegatedAgents: agents
                 }
             }
-            await axios.post(process.env.TENANT+'api/v1/users/'+req.query.id,payload)
+            await axios.post(process.env.TENANT+'api/v1/users/'+req.userContext,payload)
             res.status(200).send();
         }
         else {
-            res.status(200).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an entity"})
         }
     } catch(error){
         console.log(error)
@@ -44,18 +67,12 @@ router.post("/agents", async function(req,res) {
 
 router.delete("/agents", async function(req,res) {
     try{
-        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.query.id)
-        console.log(resp.data)
+        var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
             var agents = resp.data.profile.delegatedAgents
-            console.log(agents)
             var filtered = agents.filter(function(value, index, arr){
-                console.log(value + " "+ req.query.agentid)
-                console.log(JSON.stringify(value) !== req.query.agentid)
                 return value !== req.query.agentid;
             });
-
-            console.log(filtered)
 
             var payload = {
                 profile: {
@@ -66,7 +83,7 @@ router.delete("/agents", async function(req,res) {
             res.status(200).send();
         }
         else {
-            res.status(200).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an entity"})
         }
     } catch(error){
         console.log(error)
