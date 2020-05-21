@@ -60,6 +60,8 @@ module.exports = function (){
                     }
                     structure[commands].push(loaCommand)
                 }
+            } else{
+                console.log("Nothing to enrich for "+req.body.data.context.protocol.request.state)
             }
             res.status(200).json(structure)
         } catch(error){
