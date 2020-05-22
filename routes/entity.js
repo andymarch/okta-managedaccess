@@ -27,7 +27,7 @@ router.get("/agents", async function(req,res) {
 })
 
 //Add a user to the list of delegated agents
-router.post("/agents", async function(req,res) {
+router.post("/agents/add", async function(req,res) {
     try{
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){ 
@@ -35,8 +35,8 @@ router.post("/agents", async function(req,res) {
             try{
                 //agentid could be either the id of the user or their login
                 //a user login can contain nonURL safe characters so encode that
-                var resp = await axios.get(process.env.TENANT+'api/v1/users/'+encodeURI(req.userContext))
-                agentid = resp.data.id
+                var agentResp = await axios.get(process.env.TENANT+'api/v1/users/'+encodeURI(req.body.agentid))
+                agentid = agentResp.data.id
             } catch (error){
                 //could not find that user
                 res.status(404).send("user " + req.body.agentid + " not found")
@@ -44,7 +44,9 @@ router.post("/agents", async function(req,res) {
             }
 
             var agents = resp.data.profile.delegatedAgents
-            if (agents == null){
+            console.log(agents)
+            if (agents == undefined){
+                console.log("creating new agents array")
                 agents = []
             }
             agents.push(agentid)
@@ -65,8 +67,10 @@ router.post("/agents", async function(req,res) {
     }
 })
 
-router.delete("/agents", async function(req,res) {
+router.post("/agents/remove", async function(req,res) {
     try{
+        console.log(req)
+        console.log("request to remove "+req.body.agentid)
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
             var agents = resp.data.profile.delegatedAgents
