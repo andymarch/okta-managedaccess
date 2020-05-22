@@ -35,7 +35,7 @@ router.post("/agents", async function(req,res) {
             try{
                 //agentid could be either the id of the user or their login
                 //a user login can contain nonURL safe characters so encode that
-                var resp = await axios.get(process.env.TENANT+'api/v1/users/'+encodeURI(req.query.agentid))
+                var resp = await axios.get(process.env.TENANT+'api/v1/users/'+encodeURI(req.userContext))
                 agentid = resp.data.id
             } catch (error){
                 //could not find that user
@@ -71,7 +71,7 @@ router.delete("/agents", async function(req,res) {
         if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
             var agents = resp.data.profile.delegatedAgents
             var filtered = agents.filter(function(value, index, arr){
-                return value !== req.query.agentid;
+                return value !== req.body.agentid;
             });
 
             var payload = {
@@ -79,7 +79,7 @@ router.delete("/agents", async function(req,res) {
                     delegatedAgents: filtered
                 }
             }
-            await axios.post(process.env.TENANT+'api/v1/users/'+req.query.id,payload)
+            await axios.post(process.env.TENANT+'api/v1/users/'+req.userContext,payload)
             res.status(200).send();
         }
         else {
