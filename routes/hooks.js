@@ -30,11 +30,22 @@ module.exports = function (){
                             {
                                 'op': 'add',
                                 'path': '/claims/on_behalf',
-                                'value': "True"
+                                'value': 'True'
                             }
                         ]
                     }
                     structure[commands].push(onBehalfCommand)
+
+                    var loaCommand = {
+                        'type': 'com.okta.access.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/LOA',
+                                'value': resp.data.profile.LOA
+                            }
+                        ]
+                    }
 
                     if(resp.data.type.id == process.env.USER_TYPE_ID || 
                         resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){
@@ -43,7 +54,7 @@ module.exports = function (){
                                 'type': 'com.okta.access.patch',
                                 'value': [
                                     {
-                                        'op': 'add',
+                                        'op': 'replace',
                                         'path': '/claims/customer_number',
                                         'value': resp.data.profile.customer_reference_number
                                     }
@@ -52,7 +63,7 @@ module.exports = function (){
                             structure[commands].push(entityIdCommand)
                     }
 
-                    if(resp.data.type.id == process.env.oty978nctxFmMVoBL0x6){
+                    if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
 
                         var entityIdCommand = {
                             'type': 'com.okta.access.patch',
@@ -78,16 +89,7 @@ module.exports = function (){
                         }
                         structure[commands].push(entityNameCommand)
 
-                        var loaCommand = {
-                            'type': 'com.okta.access.patch',
-                            'value': [
-                                {
-                                    'op': 'add',
-                                    'path': '/claims/LOA',
-                                    'value': resp.data.profile.LOA
-                                }
-                            ]
-                        }
+
                     }
 
                     structure[commands].push(loaCommand)
