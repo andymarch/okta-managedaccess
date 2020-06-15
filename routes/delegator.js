@@ -5,11 +5,53 @@ const AgentModel = require('../models/agentmodel')
 
 module.exports = function (){
 
+router.post("/delegation", async function (req,res){
+    if(req.body.op == null){
+        res.status(400)
+        return
+    }
+
+    var operation = req.body.op.toUpperCase()
+    if(operation == "ACTIVATE" || operation == "DEACTIVATE"){        
+        var type = (operation == "ACTIVATE") ? process.env.DELEGATED_USER_TYPE_ID : process.env.USER_TYPE_ID
+        
+        try{
+            var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
+            var profile = resp.data.profile
+            if(operation == "ACTIVATE"){
+                //this is a work around for authorization server can_delegate
+                //claim in the authz server
+                profile.delegatedAgents = []
+            } else {
+                //remove attributes not present on parent object type
+                delete profile.delegatedAgents
+            }
+
+            var payload = {
+                id: resp.data.id,
+                profile: profile,
+                credentials: resp.data.credentials,
+                type: {
+                    id: type
+                }
+            }
+            await axios.put(process.env.TENANT+'api/v1/users/'+req.userContext,payload)
+            res.status(200).send()
+        } catch(error){
+            console.log(error)
+            res.status(500).send("An error occurred")
+        }
+    }
+    else{
+        res.status(400).send("Invalid operation")
+    }
+})
+
 //List the agents of the user
 router.get("/agents", async function(req,res) {
     try{
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
-        if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
+        if(resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){
             var agents = []
             for(var entry in resp.data.profile.delegatedAgents){
                 var agent = await axios.get(process.env.TENANT + 'api/v1/users/'+resp.data.profile.delegatedAgents[entry])
@@ -18,7 +60,7 @@ router.get("/agents", async function(req,res) {
             res.status(200).json({agents: agents})
         }
         else {
-            res.status(400).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an delegatable user type"})
         }
     } catch(error){
         console.log(error)
@@ -30,7 +72,7 @@ router.get("/agents", async function(req,res) {
 router.post("/agents/add", async function(req,res) {
     try{
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
-        if(resp.data.type.id == process.env.ENTITY_TYPE_ID){ 
+        if(resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){ 
             var agentid;
             try{
                 //agentid could be either the id of the user or their login
@@ -59,7 +101,7 @@ router.post("/agents/add", async function(req,res) {
             res.status(200).send();
         }
         else {
-            res.status(400).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an delegatable user type"})
         }
     } catch(error){
         console.log(error)
@@ -72,7 +114,7 @@ router.post("/agents/remove", async function(req,res) {
         console.log(req)
         console.log("request to remove "+req.body.agentid)
         var resp = await axios.get(process.env.TENANT+'api/v1/users/'+req.userContext)
-        if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
+        if(resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){
             var agents = resp.data.profile.delegatedAgents
             var filtered = agents.filter(function(value, index, arr){
                 return value !== req.body.agentid;
@@ -87,7 +129,7 @@ router.post("/agents/remove", async function(req,res) {
             res.status(200).send();
         }
         else {
-            res.status(400).json({error: "Not an entity"})
+            res.status(400).json({error: "Not an delegatable user type"})
         }
     } catch(error){
         console.log(error)

@@ -23,40 +23,73 @@ module.exports = function (){
                 });              
                 
                 if(match){
-                    var entityIdCommand = {
+                    //always patch in the on_behalf claim
+                    var onBehalfCommand = {
                         'type': 'com.okta.access.patch',
                         'value': [
                             {
                                 'op': 'add',
-                                'path': '/claims/entity_id',
-                                'value': resp.data.profile.entityId
+                                'path': '/claims/on_behalf',
+                                'value': "True"
                             }
                         ]
                     }
-                    structure[commands].push(entityIdCommand)
+                    structure[commands].push(onBehalfCommand)
 
-                    var entityNameCommand = {
-                        'type': 'com.okta.identity.patch',
-                        'value': [
-                            {
-                                'op': 'add',
-                                'path': '/claims/entity_name',
-                                'value': resp.data.profile.entityName
+                    if(resp.data.type.id == process.env.USER_TYPE_ID || 
+                        resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){
+                        
+                            var entityIdCommand = {
+                                'type': 'com.okta.access.patch',
+                                'value': [
+                                    {
+                                        'op': 'add',
+                                        'path': '/claims/customer_number',
+                                        'value': resp.data.profile.customer_reference_number
+                                    }
+                                ]
                             }
-                        ]
+                            structure[commands].push(entityIdCommand)
                     }
-                    structure[commands].push(entityNameCommand)
 
-                    var loaCommand = {
-                        'type': 'com.okta.access.patch',
-                        'value': [
-                            {
-                                'op': 'add',
-                                'path': '/claims/LOA',
-                                'value': resp.data.profile.LOA
-                            }
-                        ]
+                    if(resp.data.type.id == process.env.oty978nctxFmMVoBL0x6){
+
+                        var entityIdCommand = {
+                            'type': 'com.okta.access.patch',
+                            'value': [
+                                {
+                                    'op': 'add',
+                                    'path': '/claims/entity_id',
+                                    'value': resp.data.profile.entityId
+                                }
+                            ]
+                        }
+                        structure[commands].push(entityIdCommand)
+
+                        var entityNameCommand = {
+                            'type': 'com.okta.identity.patch',
+                            'value': [
+                                {
+                                    'op': 'add',
+                                    'path': '/claims/entity_name',
+                                    'value': resp.data.profile.entityName
+                                }
+                            ]
+                        }
+                        structure[commands].push(entityNameCommand)
+
+                        var loaCommand = {
+                            'type': 'com.okta.access.patch',
+                            'value': [
+                                {
+                                    'op': 'add',
+                                    'path': '/claims/LOA',
+                                    'value': resp.data.profile.LOA
+                                }
+                            ]
+                        }
                     }
+
                     structure[commands].push(loaCommand)
                 }
             }

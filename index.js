@@ -52,9 +52,9 @@ function verifyServiceAccess(req,res,next){
 }
 
 var agentRouter = require('./routes/agent')()
-var entityRouter = require('./routes/entity')()
+var delegatorRouter = require('./routes/delegator')()
 var hooksRouter = require('./routes/hooks')()
-app.use('/entity', verifyUserAccess, entityRouter)
+app.use('/delegator', verifyUserAccess, delegatorRouter)
 app.use('/agent', verifyUserAccess, agentRouter)
 app.use('/tokenEnrichment', verifyServiceAccess, hooksRouter)
 

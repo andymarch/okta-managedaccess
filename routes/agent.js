@@ -4,6 +4,7 @@ const axios = require('axios')
 var querystring = require("querystring");
 var cache = require('memory-cache');
 const uudiv1 = require('uuid/v1');
+const DelegatorModel = require('../models/delegatormodel')
 
 module.exports = function (){
 
@@ -12,7 +13,12 @@ router.get("/", async function(req,res) {
     try{
         var query = querystring.stringify({search: 'profile.delegatedAgents eq "' + req.userContext + '"'})
         var resp = await axios.get(process.env.TENANT + 'api/v1/users/?'+query)
-        res.json(resp.data)
+        var delegators = []
+        for(var entry in resp.data){
+            var delegator = await axios.get(process.env.TENANT + 'api/v1/users/'+resp.data[entry].id)
+            delegators.push(new DelegatorModel(delegator.data))
+            }
+        res.json(delegators)
     } catch(error){
         console.log(error)
         res.status(500).send("An error occurred")
@@ -23,12 +29,13 @@ router.get("/", async function(req,res) {
 //state during a refresh
 router.post("/", async function(req,res) {
     try{
-        var entityQuery = await axios.get(process.env.TENANT+'api/v1/users/'+req.body.entityid)
-        if(entityQuery.data.type.id != process.env.ENTITY_TYPE_ID){
-            res.status(400).json({error: "Not an entity"})
+        var delegatorQuery = await axios.get(process.env.TENANT+'api/v1/users/'+req.body.entityid)
+        if(delegatorQuery.data.type.id != process.env.DELEGATED_USER_TYPE_ID &&
+             delegatorQuery.data.type.id != process.env.ENTITY_TYPE_ID){
+            res.status(400).json({error: "Not an delegatable user type"})
         }
         else{
-            entityQuery.data.profile.delegatedAgents.forEach(element => {
+            delegatorQuery.data.profile.delegatedAgents.forEach(element => {
                 if(element === req.userContext){
                     match = true
                 }
@@ -41,7 +48,7 @@ router.post("/", async function(req,res) {
                 res.status(200).send({id:cacheid});
             }
             else{
-                res.status(401).json({error: "User is not delegated by that entity."})
+                res.status(401).json({error: "User is not delegated by that delegator."})
             }
         }
     } catch(error){
