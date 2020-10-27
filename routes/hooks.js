@@ -36,6 +36,9 @@ module.exports = function (){
                     }
                     structure[commands].push(onBehalfCommand)
 
+                    //note this assumes the sub is the users login
+                    //login is common but can be overriden with client mappings
+                    //switch case by the client id in context.protocol.client.id
                     var onBehalfSubCommmand = {
                         'type': 'com.okta.access.patch',
                         'value': [
@@ -75,6 +78,8 @@ module.exports = function (){
                             structure[commands].push(entityIdCommand)
                     }
 
+
+                    //Handle additonal claims for non-user type
                     if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
 
                         var entityIdCommand = {
