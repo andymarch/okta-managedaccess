@@ -36,6 +36,18 @@ module.exports = function (){
                     }
                     structure[commands].push(onBehalfCommand)
 
+                    var onBehalfSubCommmand = {
+                        'type': 'com.okta.access.patch',
+                        'value': [
+                            {
+                                'op': 'add',
+                                'path': '/claims/on_behalf_sub',
+                                'value': resp.data.profile.login
+                            }
+                        ]
+                    }
+                    structure[commands].push(onBehalfSubCommmand)
+
                     var loaCommand = {
                         'type': 'com.okta.access.patch',
                         'value': [
