@@ -36,6 +36,21 @@ module.exports = function (){
                     }
                     structure[commands].push(onBehalfCommand)
 
+                    //ensure that the delegated user does not have the can_delegate
+                    //claim. Only the true sub can add delegates but this will
+                    //hide any function that is only available to the true sub.
+                    var canDelegateCommand = {
+                        'type': 'com.okta.access.patch',
+                        'value': [
+                            {
+                                'op': 'remove',
+                                'path': '/claims/can_delegate',
+                                'value': 'False'
+                            }
+                        ]
+                    }
+                    structure[commands].push(canDelegateCommand)
+
                     //note this assumes the sub is the users login
                     //login is common but can be overriden with client mappings
                     //switch case by the client id in context.protocol.client.id
