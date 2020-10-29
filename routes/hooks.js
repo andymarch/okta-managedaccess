@@ -43,7 +43,7 @@ module.exports = function (){
                         'type': 'com.okta.access.patch',
                         'value': [
                             {
-                                'op': 'remove',
+                                'op': 'replace',
                                 'path': '/claims/can_delegate',
                                 'value': 'False'
                             }
