@@ -6,7 +6,7 @@
     "keywords": ["oauth", "oidc", "okta"],
     "env": {
         "TENANT": {
-            "description": "The URL of your Okta tenant, this can be either the tenant itself https://<yourname>.okta.com or a API Access Management authorization server https://<yourname>.okta.com/oauth2/<serverid>",
+            "description": "The URL of your Okta tenant, https://<yourname>.okta.com.",
             "value": ""
         },
         "TOKEN": {
@@ -19,7 +19,7 @@
         },
         "TOKEN_AUD":{
             "description": "The audience of the OAuth authorization server which will send requests to this service.",
-            "generator": "secret"
+            "value": ""
         },
         "USER_TYPE_ID": {
             "description": "The user type id for non-delegatable users.",
