@@ -65,6 +65,8 @@ PORT=5000
 TOKEN_AUD=<Token audience>
 ISSUER=<token issuer uri>
 SERVICE_AUTH_SECRET=<random>
+DELEGATED_ACCESS_CLAIMS=
+DELEGATED_IDENTITY_CLAIMS=
 ```
 - Host the service at a public address
 - Start the service with ```npm run start```

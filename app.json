@@ -36,6 +36,16 @@
         "SERVICE_AUTH_SECRET": {
           "description": "The authorization header value sent by the hook .",
           "value": ""
+        },
+        "DELEGATED_ACCESS_CLAIMS":{
+          "description": "Space seperated list of attributes to patch as claims in the access token",
+          "value": "",
+          "required": false
+        },
+        "DELEGATED_IDENTITY_CLAIMS": {
+          "description": "Space seperated list of attributes to patch as claims in the identity token.",
+          "value": "",
+          "required": false
         }
     },
     "success_url": "/"

@@ -9,12 +9,17 @@ module.exports = function (){
             var structure = {}
             var commands = 'commands'
             structure[commands] = []
-            //determine if this is a refresh
+
+            //using the state provided by the client to the authorization server
+            //identify if we have a matching exercise request
             var entityId = cache.get(req.body.data.context.protocol.request.state)
 
             if(entityId){
+                //invalidate excerise request for that key
+                cache.del(req.body.data.context.protocol.request.state)
+
                 var resp = await axios.get(process.env.TENANT+'api/v1/users/'+entityId)
-                //check the user is still delegated by the entity
+                //check the user calling authorize is delegated by the entity
                 var match = false;
                 resp.data.profile.delegatedAgents.forEach(element => {
                     if(element === req.body.data.context.user.id){
@@ -66,65 +71,47 @@ module.exports = function (){
                     }
                     structure[commands].push(onBehalfSubCommmand)
 
-                    var loaCommand = {
-                        'type': 'com.okta.access.patch',
-                        'value': [
-                            {
-                                'op': 'add',
-                                'path': '/claims/LOA',
-                                'value': resp.data.profile.LOA
-                            }
-                        ]
-                    }
+                    //TODO these should only patch if the claim exists already
+                    //this would fix conditions where a claim is included in a
+                    //scope condition
 
-                    if(resp.data.type.id == process.env.USER_TYPE_ID || 
-                        resp.data.type.id == process.env.DELEGATED_USER_TYPE_ID){
-                        
-                            var entityIdCommand = {
-                                'type': 'com.okta.access.patch',
-                                'value': [
-                                    {
-                                        'op': 'replace',
-                                        'path': '/claims/customer_number',
-                                        'value': resp.data.profile.customer_reference_number
-                                    }
-                                ]
-                            }
-                            structure[commands].push(entityIdCommand)
-                    }
-
-
-                    //Handle additonal claims for non-user type
-                    if(resp.data.type.id == process.env.ENTITY_TYPE_ID){
-
-                        var entityIdCommand = {
-                            'type': 'com.okta.access.patch',
-                            'value': [
-                                {
-                                    'op': 'add',
-                                    'path': '/claims/entity_id',
-                                    'value': resp.data.profile.entityId
+                    //patch any access token claims
+                    if(process.env.DELEGATED_ACCESS_CLAIMS){
+                        process.env.DELEGATED_ACCESS_CLAIMS.split(' ').forEach(element => {
+                            if(resp.data.profile.hasOwnProperty(element)){
+                                var accessCommand = {
+                                    'type': 'com.okta.access.patch',
+                                    'value': [
+                                        {
+                                            'op': 'replace',
+                                            'path': '/claims/'+element,
+                                            'value': resp.data.profile[element]
+                                        }
+                                    ]
                                 }
-                            ]
-                        }
-                        structure[commands].push(entityIdCommand)
-
-                        var entityNameCommand = {
-                            'type': 'com.okta.identity.patch',
-                            'value': [
-                                {
-                                    'op': 'add',
-                                    'path': '/claims/entity_name',
-                                    'value': resp.data.profile.entityName
-                                }
-                            ]
-                        }
-                        structure[commands].push(entityNameCommand)
-
-
+                                structure[commands].push(accessCommand)
+                            }
+                        });
                     }
 
-                    structure[commands].push(loaCommand)
+                    //patch any requested identity token claims
+                    if(process.env.DELEGATED_IDENTITY_CLAIMS){
+                        process.env.DELEGATED_IDENTITY_CLAIMS.split(' ').forEach(element => {
+                            if(resp.data.profile.hasOwnProperty(element)){
+                                var identityCommand = {
+                                    'type': 'com.okta.identity.patch',
+                                    'value': [
+                                        {
+                                            'op': 'replace',
+                                            'path': '/claims/'+element,
+                                            'value': resp.data.profile[element]
+                                        }
+                                    ]
+                                }
+                                structure[commands].push(identityCommand)
+                            }
+                        });
+                    }
                 }
             }
             res.status(200).json(structure)
