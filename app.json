@@ -1,0 +1,39 @@
+{
+    "name": "Okta Managed Access Service",
+    "description": "Enable the delegation of authority between users with Okta OAuth authorization servers.",
+    "repository": "https://github.com/andymarch/okta-managedaccess",
+    "logo": "https://www.okta.com/sites/all/themes/Okta/images/logos/developer/Dev_Logo-02_Large.png",
+    "keywords": ["oauth", "oidc", "okta"],
+    "env": {
+        "TENANT": {
+            "description": "The URL of your Okta tenant, this can be either the tenant itself https://<yourname>.okta.com or a API Access Management authorization server https://<yourname>.okta.com/oauth2/<serverid>",
+            "value": ""
+        },
+        "TOKEN": {
+          "description": "API token for access to your Okta tenant, must be able to read and write to users who will delegate/exercise delegation.",
+          "value": ""
+        },
+        "ISSUER":{
+          "description": "The OAuth issuer URI for the service which will send requests to this service.",
+          "value": ""
+        },
+        "TOKEN_AUD":{
+            "description": "The audience of the OAuth authorization server which will send requests to this service.",
+            "generator": "secret"
+        },
+        "USER_TYPE_ID": {
+            "description": "The user type id for non-delegatable users.",
+            "value": ""
+        },
+        "DELEGATED_USER_TYPE_ID": {
+          "description": "The user type id for delegatable users.",
+          "value": ""
+        },
+        "ENTITY_TYPE_ID": {
+          "description": "The user type id for entity users.",
+          "value": ""
+        }
+    },
+    "success_url": "/"
+  }
+  

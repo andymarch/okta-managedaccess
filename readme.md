@@ -27,67 +27,44 @@ enabled are able to be delegated.
 ![Architecture Diagram](architecture.png "Architecture diagram")
 
 
-## Endpoints
+## Deploying the service
 
-### /entity
+### Tenant setup
 
-GET entity/agents?id=<entityid> - return all delegated agents for the given entityid, returns
-  error if the user is not an entity.
+#### User to User delegation
 
-POST entity/agents?id=<entityid>>&agentid=<agentid> - add the given agentid to the list of delegated
-agents on user.
+- Create a new user type for delegatable users.
+- Add the profile string array attribute of "delegatedAgents".
+- Add an inline token hook pointing to https://<serviceURI>/tokenEnrichment/agent
+- Create a custom authorization server with the following custom claims:
+    - can_delegate : access token: always : (user.delegatedAgents != null) ? "True" :
+      "False"
+- Create an access policy for the application which you wish to enable
+  delegation for which calls the token inline hook.
 
-DELETE entity/agents?id=<entityid>>&agentid=<agentid> - removes the given agentid from the list of delegated
-agents on user.
+### Deploy Service
 
-### /agent
+#### Deploy Service to Heroku
 
-GET agent?id=<agentid> - list all entities which delegate to this userid
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-POST agent?id=<agentid> - begin delegation for this user. Must include a JSON
-body of 
-```
-{
-    entityid: entityIdentifier,
-    sessionid: sessionIdentifier
-}
-```
+- Complete the config vars with the values from the tenant configuration
+- Press  ```Deploy App```
 
-## Deploying the demo
-
-### Hosted instance
-
-A hosted version of this demo is running on Heroku
-[here](https://okta-managed-access-service.herokuapp.com/).
-
-### Self hosted
-
-#### Application setup
+#### Deploy Service Manually
 
 - Clone this repository
 - Create a .env file with the following content
 ```
 TENANT=https://<yourtenant>
 TOKEN=<your api token>
-ENTITY_TYPE_ID=<id of the entity user type>
+USER_TYPE_ID=<user type id>
+DELEGATED_USER_TYPE_ID=<delegated user type id>
+ENTITY_TYPE_ID=<entity user type id>
 PORT=5000
+TOKEN_AUD=<Token audience>
+ISSUER=<token issuer uri>
 ```
 - Host the service at a public address
+- Start the service with ```npm run start```
 
-#### Tenant setup
-
-- Enable the user types EA program.
-- Create a new user type of entity.
-- Add the required profile string attributes for entity of "entityId" and
-  "entityName".
-- Add the profile string array attribute of "delegated Agents".
-- Create a custom authorization server with the following custom claims:
-    - entity_id : access token : always : (user.entityId != null) ?
-      user.entityId : null
-    - entity_name: id token : always : (user.entityName != null) ?
-      user.entityName : null
-    - can_delegate : access token: always : (user.entityId != null) ? "True" :
-      "False"
-- Add an inline token hook pointing to https://<your hosted
-  instance>/tokenEnrichment/agent
-- Create an access policy for your application which calls the token inline hook.
