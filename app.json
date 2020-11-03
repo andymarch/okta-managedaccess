@@ -32,6 +32,10 @@
         "ENTITY_TYPE_ID": {
           "description": "The user type id for entity users.",
           "value": ""
+        },
+        "SERVICE_AUTH_SECRET": {
+          "description": "The authorization header value sent by the hook .",
+          "value": ""
         }
     },
     "success_url": "/"

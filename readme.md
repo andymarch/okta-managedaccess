@@ -64,6 +64,7 @@ ENTITY_TYPE_ID=<entity user type id>
 PORT=5000
 TOKEN_AUD=<Token audience>
 ISSUER=<token issuer uri>
+SERVICE_AUTH_SECRET=<random>
 ```
 - Host the service at a public address
 - Start the service with ```npm run start```
