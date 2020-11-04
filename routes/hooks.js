@@ -2,9 +2,12 @@ const express = require('express')
 const router = express.Router()
 const axios = require('axios')
 var cache = require('memory-cache');
+const logger = require('../logger');
 
 module.exports = function (){
     router.post("/agent", async function(req,res) {
+        logger.verbose("Agent hook called.")
+        logger.debug("With payload " + req.body.data)
         try{
             var structure = {}
             var commands = 'commands'
@@ -12,9 +15,11 @@ module.exports = function (){
 
             //using the state provided by the client to the authorization server
             //identify if we have a matching exercise request
+            logger.verbose("Request state " + req.body.data.context.protocol.request.state)
             var entityId = cache.get(req.body.data.context.protocol.request.state)
 
             if(entityId){
+                logger.verbose("Cache hit with ID " + entityId)
                 //invalidate excerise request for that key
                 cache.del(req.body.data.context.protocol.request.state)
 
@@ -113,10 +118,25 @@ module.exports = function (){
                         });
                     }
                 }
+                else{
+                    //this may indicate an attempt to exercise authority which
+                    //was not granted to the user making the request but to
+                    //another authorized user
+                    logger.warn("Delegation request with state " +
+                     req.body.data.context.protocol.request.state + 
+                     " received from  user" + req.body.data.context.user.id + 
+                     " not delegated to by "+ entityId)
+                }
             }
+            else{
+                logger.verbose("State "+
+                req.body.data.context.protocol.request.state +
+                " not found in cache")
+            }
+            logger.debug("returning response 200 with payload " + structure)
             res.status(200).json(structure)
         } catch(error){
-            console.log(error)
+            logger.error(error)
             res.status(500).send("An error occurred")
         }
     })
