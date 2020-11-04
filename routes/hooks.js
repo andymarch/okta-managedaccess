@@ -33,6 +33,7 @@ module.exports = function (){
                 });              
                 
                 if(match){
+                    logger.debug("Verified delegation to "+req.body.data.context.user.id)
                     //always patch in the on_behalf claim
                     var onBehalfCommand = {
                         'type': 'com.okta.access.patch',
@@ -75,14 +76,17 @@ module.exports = function (){
                         ]
                     }
                     structure[commands].push(onBehalfSubCommmand)
+                    logger.debug("Patched delegation claims.")
 
                     //TODO these should only patch if the claim exists already
                     //this would fix conditions where a claim is included in a
                     //scope condition
 
                     //patch any access token claims
+                    logger.debug("Patching access claims")
                     if(process.env.DELEGATED_ACCESS_CLAIMS){
                         process.env.DELEGATED_ACCESS_CLAIMS.split(' ').forEach(element => {
+                            logger.silly("Requested patch of "+element)
                             if(resp.data.profile.hasOwnProperty(element)){
                                 var accessCommand = {
                                     'type': 'com.okta.access.patch',
@@ -95,13 +99,17 @@ module.exports = function (){
                                     ]
                                 }
                                 structure[commands].push(accessCommand)
+                                logger.silly("Patch of "+element+" complete")
                             }
                         });
                     }
+                    logger.debug("Completed patching access claims")
 
                     //patch any requested identity token claims
+                    logger.debug("Patching identity claims")
                     if(process.env.DELEGATED_IDENTITY_CLAIMS){
                         process.env.DELEGATED_IDENTITY_CLAIMS.split(' ').forEach(element => {
+                            logger.silly("Requested patch of "+element)
                             if(resp.data.profile.hasOwnProperty(element)){
                                 var identityCommand = {
                                     'type': 'com.okta.identity.patch',
@@ -114,9 +122,11 @@ module.exports = function (){
                                     ]
                                 }
                                 structure[commands].push(identityCommand)
+                                logger.silly("Patch of "+element+" complete")
                             }
                         });
                     }
+                    logger.debug("Completed patching identity claims")
                 }
                 else{
                     //this may indicate an attempt to exercise authority which
