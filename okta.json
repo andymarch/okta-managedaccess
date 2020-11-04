@@ -1,0 +1,8 @@
+{
+    "name": "Okta Managed Access",
+    "categories": [
+      "authentication",
+      "authorization",
+      "hooks"
+    ]
+}
