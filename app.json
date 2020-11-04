@@ -46,6 +46,10 @@
           "description": "Space seperated list of attributes to patch as claims in the identity token.",
           "value": "",
           "required": false
+        },
+        "LOG_LEVEL": {
+          "description": "Logging priority, using hte npm log levels.",
+          "value": "info"
         }
     },
     "success_url": "/"

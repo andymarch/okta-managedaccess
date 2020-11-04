@@ -67,6 +67,7 @@ ISSUER=<token issuer uri>
 SERVICE_AUTH_SECRET=<random>
 DELEGATED_ACCESS_CLAIMS=
 DELEGATED_IDENTITY_CLAIMS=
+LOG_LEVEL=info
 ```
 - Host the service at a public address
 - Start the service with ```npm run start```
