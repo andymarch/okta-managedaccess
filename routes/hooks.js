@@ -7,7 +7,7 @@ const logger = require('../logger');
 module.exports = function (){
     router.post("/agent", async function(req,res) {
         logger.verbose("Agent hook called.")
-        logger.debug("With payload " + req.body.data)
+        logger.debug("With payload " + JSON.stringify(req.body.data))
         try{
             var structure = {}
             var commands = 'commands'
@@ -143,7 +143,7 @@ module.exports = function (){
                 req.body.data.context.protocol.request.state +
                 " not found in cache")
             }
-            logger.debug("returning response 200 with payload " + structure)
+            logger.debug("returning response 200 with payload " + JSON.stringify(structure))
             res.status(200).json(structure)
         } catch(error){
             logger.error(error)
