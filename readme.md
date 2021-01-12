@@ -119,3 +119,9 @@ LOG_LEVEL=info
 - Host the service at a public address
 - Start the service with ```npm run start```
 
+## Implementing Clients
+
+The API is documented with OpenAPI Specification
+[here](https://app.swaggerhub.com/apis-docs/andy.march/Okta-Managed-Access/1.0.0)
+an example client is available in the repository [here](https://github.com/andymarch/Token-Brand-Demo/tree/Delegation).
+
